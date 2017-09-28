@@ -1,2 +1,2 @@
-# giulioz.github.io
-My personal website.
+# Giulio Zausa
+A lazy musician ad sometimes a developer
