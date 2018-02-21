@@ -146,7 +146,7 @@ storage.init().then(() => storage.getItem("counter")).then((value) => {
     // Start the web server, listening on port 8080, AFTER the counter has been read
     app.listen(8080, "0.0.0.0");
 });</code></pre>
-            <p>The last think to do is writing a javascript snippet to <span class="text-primary">insert the counter</span> in out pages, and allow the server to serve <span class="text-primary">static pages</span>.</p>
+            <p>The last thing to do is writing a javascript snippet to <span class="text-primary">insert the counter</span> in our pages, and allow the server to serve <span class="text-primary">static pages</span>.</p>
             <p>After we've created a folder with our static content (<i>./static</i> in this case), we have to tell express to serve files from the folder if the urls match. Simply add this line of code under our app initialization:</p>
             <pre><code class="javascript">// Create a new Express app instance and enable static pages
 var app = express();
