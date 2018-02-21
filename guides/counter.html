@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Giulio Zausa- Developer">
+    <meta name="author" content="Giulio Zausa">
+
+    <title>Building a simple visit counter using Node.js - Giulio Zausa</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css">
+
+    <link href="../style.css" rel="stylesheet">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114517188-1"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-114517188-1');
+    </script>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg bg-secondary fixed-top text-uppercase" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand js-scroll-trigger" href="../index.html#page-top">Giulio Zausa</a>
+            <button class="navbar-toggler navbar-toggler-right text-uppercase bg-primary text-white rounded" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item mx-0 mx-lg-1">
+                        <a class="nav-link px-0 px-lg-3 rounded js-scroll-trigger" href="../index.html#about">
+                            <i class="fa fa-user"></i> About Me</a>
+                    </li>
+                    <li class="nav-item mx-0 mx-lg-1">
+                        <a class="nav-link px-0 px-lg-3 rounded js-scroll-trigger" href="../index.html#works">
+                            <i class="fa fa-paperclip"></i> Works</a>
+                    </li>
+                    <li class="nav-item mx-0 mx-lg-1">
+                        <a class="nav-link px-0 px-lg-3 rounded js-scroll-trigger" href="../index.html#guides">
+                            <i class="fa fa-book"></i> Guides</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="portfolio">
+        <div class="container">
+            <h3>Building a simple visit counter using Node.js</h3>
+            <h6>21/02/2018</h6>
+            <hr>
+            <p>Today we will learn how to build a very simple <a href="http://expressjs.com">Express</a> app for counting the visits on a website.</p>
+            <p>The first thing we have to do, after installing node.js runtime, is to create a folder for our project. After doing that we need to create our npm package and install express framework. The <i>--save</i> flag tells npm package manager to save express as a <span class="text-primary">depencency</span> on the file <i>package.json</i>, the descriptor of our project.</p>
+            <pre><code class="bash">$ mkdir NodejsVisitCounter
+$ cd NodejsVisitCounter
+$ npm init -y
+$ npm install --save express</code></pre>
+            <p>Now we can start writing our application, on a new file called <i>index.js</i>:</p>
+            <pre><code class="javascript">// Loads express library
+const express = require('express');
+
+// Holds the current views
+var counter = 0;
+
+// Create a new Express app instance
+var app = express();
+
+// Registers an event triggered on HTTP GET /visit
+app.get("/visit", (req, res) => {
+    counter++;
+    res.json(counter);
+});
+
+// Start the web server, listening on port 8080
+app.listen(8080, "0.0.0.0");</code></pre>
+            <p>This server is very simple: it increments a counter every time an user visits the url <span class="text-primary"><i>/visit</i></span> and returns the current counter. To register a function to be called whenever there are incoming HTTP request we use <code>app.get(path, function)</code>, <code>app.post(path, function)</code> and so on.</p>
+            <p>We have two parameters on the event function:</p>
+            <ul>
+                <li><code>req</code> tells us info about the current <span class="text-primary">request</span>: path, body, cookies, headers, ...</li>
+                <li><code>res</code> allows us to write data as <span class="text-primary">response</span> back to the client</li>
+            </ul>
+            <p>Note how we are using <code>res.json()</code> to send data back to the client using the <span class="text-primary">JSON</span> format: this way the javascript frontend will be able to understand it easier.</p>
+            <p>Now we want to test the code. We have to call the node runtime, passing our main source file (<i>index.js</i>) as parameter:</p>
+            <pre><code class="bash">$ node index.js</code></pre>
+            <p>Let's open a browser and test our server: go to page <span class="text-primary"><i>http://localhost:8080/visit</i></span>.</p>
+            <img class="d-block mx-auto" src="counter_img/browser_test1.gif" />
+            <p>Yey! Our server works.</p>
+            <p>But we can already see some major flaws:</p>
+            <ul>
+                <li>every time our server closes the counter isn't being <span class="text-primary">saved</span> anywhere</li>
+                <li>this way our server is responding only to a single url, we want some <span class="text-primary">static content</span> to be served as well</li>
+            </ul>
+            <p>Let's address the first issue and save our counter. If we want to save persistent data without using a DB, the easiest way is using a library called <a href="https://github.com/simonlast/node-persist">node-persist</a>, which saves on JSON files. Let's install it using npm:</p>
+            <pre><code class="bash">$ npm install --save node-persist</code></pre>
+            <p>The library gives us functions to read and store data, but first we have to call <code>storage.init()</code> to initialize it. Note that, as almost everything in node.js, these function are asynchronously and return <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">Promises</a>.</p>
+            <ul>
+                <li><code>storage.setItem(key, value)</code> saves a value</li>
+                <li><code>storage.getItem(key)</code> reads a value, returning a promise with the value read as parameter</li>
+            </ul>
+            <p>Let's update our code accordingly, loading and saving the counter to file using node-persist library:</p>
+            <pre><code class="javascript">// Loads express and storage library
+const express = require('express');
+const storage = require('node-persist');
+
+// Holds the current views
+var counter = 0;
+
+// Create a new Express app instance
+var app = express();
+
+// Registers an event triggered on HTTP GET /visit
+app.get("/visit", (req, res) => {
+    counter++;
+    
+    // Saves counter into the store and send response AFTER the store has been saved
+    storage.setItem("counter", counter).then(() => {
+        res.json(counter);
+    });
+});
+
+// Inits permanent storage and reads the saved counter
+storage.init().then(() => storage.getItem("counter")).then((value) => {
+    // Checks if value read is valid, otherwise set it to 0
+    if (value > 0) {
+        counter = value;
+    } else {
+        counter = 0;
+    }
+
+    // Start the web server, listening on port 8080, AFTER the counter has been read
+    app.listen(8080, "0.0.0.0");
+});</code></pre>
+            <p>The last think to do is writing a javascript snippet to <span class="text-primary">insert the counter</span> in out pages, and allow the server to serve <span class="text-primary">static pages</span>.</p>
+            <p>After we've created a folder with our static content (<i>./static</i> in this case), we have to tell express to serve files from the folder if the urls match. Simply add this line of code under our app initialization:</p>
+            <pre><code class="javascript">// Create a new Express app instance and enable static pages
+var app = express();
+app.use(express.static('./static'));</code></pre>
+            <p>Let's write now a proper HTML page (<i>index.html</i>) and place it on the <i>static</i> folder.</p>
+            <pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;style&gt;
+        body {
+            font-family: sans-serif;
+        }
+        .counter {
+            padding: 10px;
+            margin: 10px;
+            background-color: lightblue;
+            border: 1px solid blue;
+            width: 150px;
+        }
+    &lt;/style&gt;
+
+    &lt;script&gt;
+        // GET request on /visit and then parse JSON
+        fetch(&quot;/visit&quot;).then(response =&gt; response.json()).then(value =&gt; {
+            document.getElementById(&quot;countervalue&quot;).innerHTML = value;
+        });
+    &lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;h1&gt;Test page&lt;/h1&gt;
+    &lt;div class=&quot;counter&quot;&gt;
+        You are visitor number: &lt;span id=&quot;countervalue&quot;&gt;&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+            <p>Let's open a browser and test our page: go to <span class="text-primary"><i>http://localhost:8080/</i></span>.</p>
+            <img class="d-block mx-auto" src="counter_img/browser_test2.gif" />
+        </div>
+    </section>
+
+    <div class="copyright py-4 text-center text-white">
+        <div class="container">
+            <small>Copyright &copy; Giulio Zausa 2018</small>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+    <div class="scroll-to-top d-lg-none position-fixed ">
+        <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top">
+            <i class="fa fa-chevron-up"></i>
+        </a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/threejs/r84/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="../site.js"></script>
+
+</body>
+
+</html>
